@@ -1,29 +1,22 @@
 import { createStore } from "redux";
+import { createAction, createReducer, configureStore } from "@reduxjs/toolkit";
 
-const ADD_TODO = "ADD_TODO";
-const DELETE_TODO = "DELETE_TODO";
+const addToDo = createAction("ADD_TODO");
+const deleteToDo = createAction("DELETE_TODO");
 
-const addToDo = (text) => {
-  return { type: ADD_TODO, text };
-};
+// onsole.log(addToDo, deleteToDo); // f ADD_TODO f DELETE_TODO
+// console.log(addToDo(), deleteToDo()); // {type: "ADD_TODO", payload: undefined} {type: "DELETE_TODO", payload: undefined}
 
-const deleteToDo = (id) => {
-  return { type: DELETE_TODO, id };
-};
+// createReducer()를 이용하면 state를 바로 수정 할 수 있다.
+const reducer = createReducer([], {
+  [addToDo]: (state, action) => {
+    state.unshift({ id: Date.now(), text: action.payload });
+  },
+  [deleteToDo]: (state, action) => state.filter((toDo) => toDo.id !== action.payload),
+});
 
-const reducer = (state = [], action) => {
-  switch (action.type) {
-    case ADD_TODO:
-      return [{ id: Date.now(), text: action.text }, ...state];
-    case DELETE_TODO:
-      const newList = state.filter((toDo) => toDo.id !== action.id);
-      return newList;
-    default:
-      return state;
-  }
-};
-
-const store = createStore(reducer);
+// configureStore() => Redux DevTools 활성화됨.
+const store = configureStore({ reducer });
 
 export const actionCreators = {
   addToDo,
